@@ -4,6 +4,7 @@ const fs = require("fs");
 const webpack = require("webpack");
 const CompressionPlugin = require("compression-webpack-plugin");
 const miniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const glob = require("glob");
 const po2json = require("po2json");
 
@@ -119,6 +120,8 @@ var plugins = [
     new miniCssExtractPlugin({ filename: "[name].css" }),
 ];
 
+plugins.push(new ESLintPlugin({ extensions: ["js", "jsx"], exclude: ["spec", "node_modules"] }));
+
 if (!production) {
     /* copy jasmine files over */
     plugins.unshift(new copy([
@@ -174,12 +177,6 @@ module.exports = {
     stats: "errors-warnings",
     module: {
         rules: [
-            {
-                enforce: 'pre',
-                exclude: /node_modules/,
-                loader: 'eslint-loader',
-                test: /\.jsx$/
-            },
             {
                 exclude: /node_modules/,
                 loader: 'babel-loader',

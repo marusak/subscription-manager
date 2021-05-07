@@ -17,15 +17,15 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-var cockpit = require("cockpit");
-var _ = cockpit.gettext;
-
-var React = require("react");
 import Select from "./Select/Select.jsx";
 import '../lib/form-layout.less';
 
 import subscriptionsClient from './subscriptions-client';
 import * as Insights from './insights.jsx';
+var cockpit = require("cockpit");
+var _ = cockpit.gettext;
+
+var React = require("react");
 
 /* Subscriptions: registration dialog body
  * Expected props:
@@ -50,21 +50,21 @@ class PatternDialogBody extends React.Component {
                     </label>
                     <input className="form-control" id="subscription-proxy-server" type="text"
                            placeholder="hostname:port" value={this.props.proxy_server}
-                           onChange={value => this.props.onChange('proxy_server', value)}/>
+                           onChange={value => this.props.onChange('proxy_server', value)} />
 
                     <label className="control-label" htmlFor="subscription-proxy-user">
                         {_("Proxy Username")}
                     </label>
                     <input className="form-control" id="subscription-proxy-user" type="text"
                            value={this.props.proxy_user}
-                           onChange={value => this.props.onChange('proxy_user', value)}/>
+                           onChange={value => this.props.onChange('proxy_user', value)} />
 
                     <label className="control-label" htmlFor="subscription-proxy-password">
                         {_("Proxy Password")}
                     </label>
                     <input className="form-control" id="subscription-proxy-password" type="password"
                            value={this.props.proxy_password}
-                           onChange={value => this.props.onChange('proxy_password', value)}/>
+                           onChange={value => this.props.onChange('proxy_password', value)} />
                 </form>
             );
         }
@@ -76,9 +76,9 @@ class PatternDialogBody extends React.Component {
                 </label>,
                 <label key="1" className="checkbox-inline">
                     <input id="subscription-insights" type="checkbox" checked={this.props.insights}
-                           onChange={value => this.props.onChange('insights', value)}/>
+                           onChange={value => this.props.onChange('insights', value)} />
                     <span>
-                    { Insights.arrfmt(_("Connect this system to $0."), Insights.link) }
+                        { Insights.arrfmt(_("Connect this system to $0."), Insights.link) }
                     </span>
                 </label>,
                 (this.props.insights && !this.props.insights_detected) && <p>{ Insights.arrfmt(_("The $0 package will be installed."), <strong>{subscriptionsClient.insightsPackage}</strong>)}</p>
@@ -86,8 +86,8 @@ class PatternDialogBody extends React.Component {
         }
 
         const urlEntries = {
-            'default': _("Default"),
-            'custom': _("Custom URL"),
+            default: _("Default"),
+            custom: _("Custom URL"),
         };
         return (
             <div className="modal-body">
@@ -97,8 +97,8 @@ class PatternDialogBody extends React.Component {
                     </label>
                     <Select key='urlSource' onChange={value => this.props.onChange('url', value)}
                             id="subscription-register-url" value={this.props.url}>
-                        <option value="default">{ urlEntries['default'] }</option>
-                        <option value="custom" >{ urlEntries['custom'] }</option>
+                        <option value="default">{ urlEntries.default }</option>
+                        <option value="custom">{ urlEntries.custom }</option>
                     </Select>
                     {customURL}
                     <label className="control-label">
@@ -106,7 +106,7 @@ class PatternDialogBody extends React.Component {
                     </label>
                     <label className="checkbox-inline">
                         <input id="subscription-proxy-use" type="checkbox" checked={this.props.proxy}
-                               onChange={value => this.props.onChange('proxy', value)}/>
+                               onChange={value => this.props.onChange('proxy', value)} />
                         {_("I would like to connect via an HTTP proxy.")}
                     </label>
                     {proxy}
@@ -115,26 +115,26 @@ class PatternDialogBody extends React.Component {
                     </label>
                     <input id="subscription-register-username" className="form-control" type="text"
                            value={this.props.user}
-                           onChange={value => this.props.onChange('user', value)}/>
+                           onChange={value => this.props.onChange('user', value)} />
                     <label className="control-label" htmlFor="subscription-register-password">
                         {_("Password")}
                     </label>
                     <input id="subscription-register-password" className="form-control" type="password"
                            value={this.props.password}
-                           onChange={value => this.props.onChange('password', value)}/>
+                           onChange={value => this.props.onChange('password', value)} />
                     <label className="control-label" htmlFor="subscription-register-key">
                         {_("Activation Key")}
                     </label>
                     <input id="subscription-register-key" className="form-control" type="text"
                            placeholder="key_one,key_two" value={this.props.activation_keys}
-                           onChange={value => this.props.onChange('activation_keys', value)}/>
+                           onChange={value => this.props.onChange('activation_keys', value)} />
 
                     <label className="control-label" htmlFor="subscription-register-org">
                         {_("Organization")}
                     </label>
                     <input id="subscription-register-org" className="form-control" type="text"
                            value={this.props.org}
-                           onChange={value => this.props.onChange('org', value)}/>
+                           onChange={value => this.props.onChange('org', value)} />
                     {insights}
                 </form>
             </div>

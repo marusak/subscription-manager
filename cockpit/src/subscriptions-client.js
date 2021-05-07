@@ -17,13 +17,13 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-const cockpit = require("cockpit");
 import * as PK from "../lib/packagekit";
+const cockpit = require("cockpit");
 
 const _ = cockpit.gettext;
 
 function createProxy(name) {
-    let service = cockpit.dbus('com.redhat.RHSM1', {'superuser': 'require'});
+    const service = cockpit.dbus('com.redhat.RHSM1', { superuser: 'require' });
     return service.proxy(`com.redhat.RHSM1.${name}`, `/com/redhat/RHSM1/${name}`);
 }
 
@@ -55,10 +55,10 @@ client.config = {
 
 client.syspurposeStatus = {
     info : {
-        "service_level_agreement" : null,
-        "usage" : null,
-        "role" : null,
-        "addons" : null,
+        service_level_agreement : null,
+        usage : null,
+        role : null,
+        addons : null,
     },
     status : null,
 };
@@ -76,7 +76,7 @@ const RHSM_DEFAULTS = { // TODO get these from a d-bus service instead
 // we trigger an event called "dataChanged" when the data has changed
 
 function needRender() {
-    let event = document.createEvent("Event");
+    const event = document.createEvent("Event");
     event.initEvent("dataChanged", false, false);
     client.dispatchEvent(event);
 }
@@ -89,13 +89,13 @@ function parseProducts(text) {
     const products = JSON.parse(text);
     return products.map(function(product) {
         return {
-            'productName': product[0],
-            'productId': product[1],
-            'version': product[2],
-            'arch': product[3],
-            'status': product[4],
-            'starts': product[6],
-            'ends': product[7]
+            productName: product[0],
+            productId: product[1],
+            version: product[2],
+            arch: product[3],
+            status: product[4],
+            starts: product[6],
+            ends: product[7]
         };
     });
 }
@@ -141,16 +141,16 @@ function parseErrorSeverity(error) {
  */
 function safeDBusCall(serviceProxy, delegateMethod) {
     return serviceProxy.wait()
-        .then(delegateMethod)
-        .fail(ex => {
-            console.debug(ex);
-        });
+            .then(delegateMethod)
+            .fail(ex => {
+                console.debug(ex);
+            });
 }
 
 let gettingDetails = false;
 let getDetailsRequested = false;
 function getSubscriptionDetails() {
-    if (isRegistering) { return; }
+    if (isRegistering) { return }
     if (gettingDetails) {
         getDetailsRequested = true;
         return;
@@ -159,21 +159,21 @@ function getSubscriptionDetails() {
     gettingDetails = true;
     safeDBusCall(productsService, () => {
         productsService.ListInstalledProducts('', {}, userLang) // FIXME: use proxy settings
-        .then(result => {
-            client.subscriptionStatus.products = parseProducts(result);
-        })
-        .catch(error => {
-            client.subscriptionStatus.error = {
-                                    'severity': parseErrorSeverity(error),
-                                    'msg': parseErrorMessage(error)
-                                };
-        })
-        .then(() => {
-            gettingDetails = false;
-            if (getDetailsRequested)
-                getSubscriptionDetails();
-            needRender();
-        });
+                .then(result => {
+                    client.subscriptionStatus.products = parseProducts(result);
+                })
+                .catch(error => {
+                    client.subscriptionStatus.error = {
+                        severity: parseErrorSeverity(error),
+                        msg: parseErrorMessage(error)
+                    };
+                })
+                .then(() => {
+                    gettingDetails = false;
+                    if (getDetailsRequested)
+                        getSubscriptionDetails();
+                    needRender();
+                });
     });
 }
 
@@ -222,11 +222,11 @@ client.registerSystem = (subscriptionDetails, update_progress) => {
         /*  parse url into host, port, handler; sorry about the ugly regex */
         const pattern = new RegExp(
             '^' +
-            '(?:https?://)?' +              // protocol (optional)
-            '(?:\\[([^\\]]+)\\])?' +        // ipv6 address (optional)
-            '(?:([^/:]+))?' +               // hostname/ipv4 address (optional)
-            '(?::(?=[0-9])([0-9]+))?' +     // port (optional)
-            '(?:(/.+))?' +                  // path (optional)
+            '(?:https?://)?' + // protocol (optional)
+            '(?:\\[([^\\]]+)\\])?' + // ipv6 address (optional)
+            '(?:([^/:]+))?' + // hostname/ipv4 address (optional)
+            '(?::(?=[0-9])([0-9]+))?' + // port (optional)
+            '(?:(/.+))?' + // path (optional)
             '$'
         );
         const match = pattern.exec(subscriptionDetails.server_url); // TODO handle failure
@@ -235,7 +235,7 @@ client.registerSystem = (subscriptionDetails, update_progress) => {
         const port = match[3];
         const path = match[4];
         if (ipv6Address && address) {
-            throw 'malformed server url; ipv6 address syntax and hostname are mutually exclusive';
+            throw new Error('malformed server url; ipv6 address syntax and hostname are mutually exclusive');
         }
         if (ipv6Address) {
             connection_options.host = dbus_str(ipv6Address);
@@ -256,8 +256,8 @@ client.registerSystem = (subscriptionDetails, update_progress) => {
         if (subscriptionDetails.proxy_server) {
             const pattern = new RegExp(
                 '^' +
-                '(?:\\[([^\\]]+)\\])?' +    // ipv6 address (optional)
-                '(?:([^/:]+))?' +           // hostname/ipv4 address (optional)
+                '(?:\\[([^\\]]+)\\])?' + // ipv6 address (optional)
+                '(?:([^/:]+))?' + // hostname/ipv4 address (optional)
                 '(?::(?=[0-9])([0-9]+))?' + // port (optional)
                 '$'
             );
@@ -266,7 +266,7 @@ client.registerSystem = (subscriptionDetails, update_progress) => {
             const address = match[2];
             let port = match[3];
             if (ipv6Address && address) {
-                throw 'malformed proxy url; ipv6 address syntax and hostname are mutually exclusive';
+                throw new Error('malformed proxy url; ipv6 address syntax and hostname are mutually exclusive');
             }
             if (ipv6Address) {
                 connection_options.proxy_hostname = dbus_str(ipv6Address);
@@ -298,153 +298,152 @@ client.registerSystem = (subscriptionDetails, update_progress) => {
 
         let registered = false;
         registerServer.Start(userLang)
-            .then(socket => {
-                console.debug('Opening private bus interface at ' + socket);
-                const private_interface = cockpit.dbus(
-                    null,
+                .then(socket => {
+                    console.debug('Opening private bus interface at ' + socket);
+                    const private_interface = cockpit.dbus(
+                        null,
                         {
                             bus: 'none',
                             address: socket,
                             superuser: 'require'
                         }
                     );
-                const registerService = private_interface.proxy(
-                    'com.redhat.RHSM1.Register',
-                    '/com/redhat/RHSM1/Register'
-                );
-                if (subscriptionDetails.activation_keys) {
-                    console.debug('registering using activation key');
-                    let result = registerService.call(
-                        'RegisterWithActivationKeys',
-                        [
-                            subscriptionDetails.org,
-                            subscriptionDetails.activation_keys.split(','),
-                            {},
-                            connection_options,
-                            userLang
-                        ]
+                    const registerService = private_interface.proxy(
+                        'com.redhat.RHSM1.Register',
+                        '/com/redhat/RHSM1/Register'
                     );
-                    registered = true;
-                    return result;
-                }
-                else {
-                    console.debug('registering using username and password');
-                    let result = registerService.call(
-                        'Register',
-                        [
-                            subscriptionDetails.org,
-                            subscriptionDetails.user,
-                            subscriptionDetails.password,
-                            {},
-                            connection_options,
-                            userLang
-                        ]
-                    );
-                    registered = true;
-                    return result;
-                }
-            })
-            .catch(error => {
-                console.error('error registering', error);
-                isRegistering = false;
-                registered = false;
-                dfd.reject(parseErrorMessage(error));
-            })
-            .then(() => {
-                console.debug('stopping registration server');
-                return registerServer.Stop(userLang);
-            })
-            .catch(error => {
-                console.error('error stopping registration bus', error);
-                isRegistering = false;
-                dfd.reject(parseErrorMessage(error));
-            })
-            .then(() => {
-                if (registered) {
+                    if (subscriptionDetails.activation_keys) {
+                        console.debug('registering using activation key');
+                        const result = registerService.call(
+                            'RegisterWithActivationKeys',
+                            [
+                                subscriptionDetails.org,
+                                subscriptionDetails.activation_keys.split(','),
+                                {},
+                                connection_options,
+                                userLang
+                            ]
+                        );
+                        registered = true;
+                        return result;
+                    } else {
+                        console.debug('registering using username and password');
+                        const result = registerService.call(
+                            'Register',
+                            [
+                                subscriptionDetails.org,
+                                subscriptionDetails.user,
+                                subscriptionDetails.password,
+                                {},
+                                connection_options,
+                                userLang
+                            ]
+                        );
+                        registered = true;
+                        return result;
+                    }
+                })
+                .catch(error => {
+                    console.error('error registering', error);
+                    isRegistering = false;
+                    registered = false;
+                    dfd.reject(parseErrorMessage(error));
+                })
+                .then(() => {
+                    console.debug('stopping registration server');
+                    return registerServer.Stop(userLang);
+                })
+                .catch(error => {
+                    console.error('error stopping registration bus', error);
+                    isRegistering = false;
+                    dfd.reject(parseErrorMessage(error));
+                })
+                .then(() => {
+                    if (registered) {
                     // Dictionary (key: client.config / rhsm.conf options, value are
                     // attributes of connection_options) ... ('handler' and 'host' are different)
                     // Note: only options from [server] section are supported
-                    let dict = {
-                        'hostname': 'host',
-                        'port': 'port',
-                        'prefix': 'handler',
-                        'proxy_hostname': 'proxy_hostname',
-                        'proxy_port': 'proxy_port',
-                        'proxy_user': 'proxy_user',
-                        'proxy_password': 'proxy_password',
-                    };
-                    // for (let key in dict) {
-                    Object.keys(dict).forEach(function (key) {
+                        const dict = {
+                            hostname: 'host',
+                            port: 'port',
+                            prefix: 'handler',
+                            proxy_hostname: 'proxy_hostname',
+                            proxy_port: 'proxy_port',
+                            proxy_user: 'proxy_user',
+                            proxy_password: 'proxy_password',
+                        };
+                        // for (let key in dict) {
+                        Object.keys(dict).forEach(function (key) {
                         // Is config option in dialog different from  rhsm.conf
-                        if (client.config[key] !== connection_options[dict[key]].v) {
-                            console.debug('saving: server.' + key, connection_options[dict[key]]);
-                            configService.Set('server.' + key, connection_options[dict[key]], userLang)
-                                .catch(error => {
-                                    console.error('unable to save server.' + key, error);
-                                });
-                        }
-                    });
+                            if (client.config[key] !== connection_options[dict[key]].v) {
+                                console.debug('saving: server.' + key, connection_options[dict[key]]);
+                                configService.Set('server.' + key, connection_options[dict[key]], userLang)
+                                        .catch(error => {
+                                            console.error('unable to save server.' + key, error);
+                                        });
+                            }
+                        });
 
-                    // When system is registered and config options are saved,
-                    // then we can try to auto-attach
-                    console.debug('auto-attaching');
-                    if (update_progress)
-                        update_progress(_("Attaching subscriptions"), null);
+                        // When system is registered and config options are saved,
+                        // then we can try to auto-attach
+                        console.debug('auto-attaching');
+                        if (update_progress)
+                            update_progress(_("Attaching subscriptions"), null);
 
-                    if (connection_options.proxy_hostname.v) {
-                        let proxy_options = {};
-                        proxy_options.proxy_hostname = connection_options.proxy_hostname;
-                        if (connection_options.proxy_port.v) {
+                        if (connection_options.proxy_hostname.v) {
+                            const proxy_options = {};
+                            proxy_options.proxy_hostname = connection_options.proxy_hostname;
+                            if (connection_options.proxy_port.v) {
                             // FIXME: change D-Bus implementation to be able to use string too
-                            proxy_options.proxy_port = {
-                                't': 'i',
-                                'v': Number(connection_options.proxy_port.v)
-                            };
-                        }
-                        if (connection_options.proxy_user.v) {
-                            proxy_options.proxy_user = connection_options.proxy_user;
-                        }
-                        if (connection_options.proxy_password.v) {
-                            proxy_options.proxy_password = connection_options.proxy_password;
-                        }
-                        return attachService.AutoAttach('', proxy_options, userLang)
-                            .catch(error => {
-                                console.error('error during auto-attach (using proxy)', error);
-                                client.subscriptionStatus.error = {
-                                    'severity': parseErrorSeverity(error),
-                                    'msg': parseErrorMessage(error)
+                                proxy_options.proxy_port = {
+                                    t: 'i',
+                                    v: Number(connection_options.proxy_port.v)
                                 };
-                                dfd.resolve();
-                            });
-                    } else {
-                        return attachService.AutoAttach('', {}, userLang)
-                            .catch(error => {
-                                console.error('error during auto-attach', error);
-                                client.subscriptionStatus.error = {
-                                    'severity': parseErrorSeverity(error),
-                                    'msg': parseErrorMessage(error)
-                                };
-                                dfd.resolve();
-                            });
+                            }
+                            if (connection_options.proxy_user.v) {
+                                proxy_options.proxy_user = connection_options.proxy_user;
+                            }
+                            if (connection_options.proxy_password.v) {
+                                proxy_options.proxy_password = connection_options.proxy_password;
+                            }
+                            return attachService.AutoAttach('', proxy_options, userLang)
+                                    .catch(error => {
+                                        console.error('error during auto-attach (using proxy)', error);
+                                        client.subscriptionStatus.error = {
+                                            severity: parseErrorSeverity(error),
+                                            msg: parseErrorMessage(error)
+                                        };
+                                        dfd.resolve();
+                                    });
+                        } else {
+                            return attachService.AutoAttach('', {}, userLang)
+                                    .catch(error => {
+                                        console.error('error during auto-attach', error);
+                                        client.subscriptionStatus.error = {
+                                            severity: parseErrorSeverity(error),
+                                            msg: parseErrorMessage(error)
+                                        };
+                                        dfd.resolve();
+                                    });
+                        }
                     }
-                }
-            })
-            .catch(error => {
-                console.error('error during auto-attach', error);
-                isRegistering = false;
-                dfd.reject(parseErrorMessage(error));
-            })
-            .then(() => {
-                console.debug('requesting update');
-                client.closeRegisterDialog = true;
-                isRegistering = false;
-                requestSubscriptionStatusUpdate().always(() => {
-                    dfd.resolve();
+                })
+                .catch(error => {
+                    console.error('error during auto-attach', error);
+                    isRegistering = false;
+                    dfd.reject(parseErrorMessage(error));
+                })
+                .then(() => {
+                    console.debug('requesting update');
+                    client.closeRegisterDialog = true;
+                    isRegistering = false;
+                    requestSubscriptionStatusUpdate().always(() => {
+                        dfd.resolve();
+                    });
+                    requestSyspurposeStatusUpdate().always(() => {
+                        dfd.resolve();
+                    });
                 });
-                requestSyspurposeStatusUpdate().always(() => {
-                    dfd.resolve();
-                });
-            });
     });
     return dfd.promise();
 };
@@ -454,17 +453,17 @@ client.unregisterSystem = () => {
     needRender();
     unregisterService.wait(() => {
         unregisterService.Unregister({}, userLang) // FIXME: use proxy settings
-            .catch(error => {
-                console.error('error unregistering system', error);
-                client.subscriptionStatus.error = {
-                                    'severity': parseErrorSeverity(error),
-                                    'msg': parseErrorMessage(error)
-                                };
-            })
-            .always(() => {
-                console.debug('requesting update');
-                requestSubscriptionStatusUpdate();
-            });
+                .catch(error => {
+                    console.error('error unregistering system', error);
+                    client.subscriptionStatus.error = {
+                        severity: parseErrorSeverity(error),
+                        msg: parseErrorMessage(error)
+                    };
+                })
+                .always(() => {
+                    console.debug('requesting update');
+                    requestSubscriptionStatusUpdate();
+                });
     });
 };
 
@@ -474,95 +473,77 @@ function statusUpdateFailed(reason) {
     needRender();
 }
 
-/* request update via DBus
- * possible status values: https://github.com/candlepin/subscription-manager/blob/30c3b52320c3e73ebd7435b4fc8b0b6319985d19/src/rhsm_icon/rhsm_icon.c#L98
- * [ RHSM_VALID, RHSM_EXPIRED, RHSM_WARNING, RHN_CLASSIC, RHSM_PARTIALLY_VALID, RHSM_REGISTRATION_REQUIRED ]
- */
-const subscriptionStatusValues = [
-    'RHSM_VALID',
-    'RHSM_EXPIRED',
-    'RHSM_WARNING',
-    'RHN_CLASSIC',
-    'RHSM_PARTIALLY_VALID',
-    'RHSM_REGISTRATION_REQUIRED'
-];
-
-function requestUpdate(callback) {
-    return callback()
-        .catch(ex => statusUpdateFailed(ex));
-}
-
 function requestSubscriptionStatusUpdate() {
     return client.getSubscriptionStatus()
-        .catch(ex => statusUpdateFailed(ex));
+            .catch(ex => statusUpdateFailed(ex));
 }
 
 function requestSyspurposeStatusUpdate() {
     return client.getSyspurposeStatus()
-        .catch(ex => statusUpdateFailed(ex));
+            .catch(ex => statusUpdateFailed(ex));
 }
 
 function requestSyspurposeUpdate() {
     return client.getSyspurpose()
-        .catch(ex => statusUpdateFailed(ex));
+            .catch(ex => statusUpdateFailed(ex));
 }
 
 /* get subscription summary */
 client.getSubscriptionStatus = function() {
-    let dfd = cockpit.defer();
+    const dfd = cockpit.defer();
 
     safeDBusCall(entitlementService, () => {
         entitlementService.GetStatus('', userLang)
-        .then(result => {
-            const status = JSON.parse(result);
-            client.subscriptionStatus.status = status.status;
-            dfd.resolve();
-            if (client.closeRegisterDialog) {
-                client.closeRegisterDialog = false;
-            }
-        })
-        .catch(ex => {
-            console.debug(ex);
-            client.subscriptionStatus.status = _("Unknown");
-        })
-        .then(() => {
-            getSubscriptionDetails();
-            needRender();
-        });
+                .then(result => {
+                    const status = JSON.parse(result);
+                    client.subscriptionStatus.status = status.status;
+                    dfd.resolve();
+                    if (client.closeRegisterDialog) {
+                        client.closeRegisterDialog = false;
+                    }
+                })
+                .catch(ex => {
+                    console.debug(ex);
+                    client.subscriptionStatus.status = _("Unknown");
+                })
+                .then(() => {
+                    getSubscriptionDetails();
+                    needRender();
+                });
     });
     return dfd.promise();
 };
 
 client.getSyspurposeStatus = () => {
-    let dfd = cockpit.defer();
-    if (isRegistering) { return dfd.promise(); }
+    const dfd = cockpit.defer();
+    if (isRegistering) { return dfd.promise() }
     return safeDBusCall(syspurposeService, () => {
         syspurposeService.GetSyspurposeStatus()
-        .then(result => {
-            client.syspurposeStatus.status = result;
-        })
-        .catch(ex => {
-                console.debug(ex);
-                client.syspurposeStatus.status = null; // TODO: change to something meaningful
-        })
-        .then(needRender);
+                .then(result => {
+                    client.syspurposeStatus.status = result;
+                })
+                .catch(ex => {
+                    console.debug(ex);
+                    client.syspurposeStatus.status = null; // TODO: change to something meaningful
+                })
+                .then(needRender);
     });
 };
 
 client.getSyspurpose = function() {
-    let dfd = cockpit.defer();
+    const dfd = cockpit.defer();
 
     safeDBusCall(syspurposeService, () => {
         syspurposeService.GetSyspurpose(userLang)
-        .then(result => {
-            client.syspurposeStatus.info = JSON.parse(result);
-            dfd.resolve();
-        })
-        .catch(ex => {
-            console.debug(ex);
-            client.syspurposeStatus.info = 'Unknown'; // TODO: change to something meaningful
-        })
-        .then(needRender);
+                .then(result => {
+                    client.syspurposeStatus.info = JSON.parse(result);
+                    dfd.resolve();
+                })
+                .catch(ex => {
+                    console.debug(ex);
+                    client.syspurposeStatus.info = 'Unknown'; // TODO: change to something meaningful
+                })
+                .then(needRender);
     });
 
     return dfd.promise();
@@ -587,12 +568,12 @@ client.readConfig = () => {
 
             const maybePort = port === '443' ? '' : `:${port}`;
             const maybePrefix = prefix === '/subscription' ? '' : prefix;
-            const hostnamePart = hostname.includes(':') ? `[${hostname}]`: hostname;
+            const hostnamePart = hostname.includes(':') ? `[${hostname}]` : hostname;
             const serverUrl = usingDefaultUrl ? '' : `${hostnamePart}${maybePort}${maybePrefix}`;
             const proxyHostnamePart = proxyHostname.includes(':') ? `[${proxyHostname}]` : proxyHostname;
             const usingProxy = proxyHostname !== '';
-            const maybeProxyPort = proxyPort ? `:${proxyPort}`: '';
-            const proxyServer = usingProxy ? `${proxyHostnamePart}${maybeProxyPort}`: '';
+            const maybeProxyPort = proxyPort ? `:${proxyPort}` : '';
+            const proxyServer = usingProxy ? `${proxyHostnamePart}${maybeProxyPort}` : '';
 
             // Note: we don't use camelCase, because we keep naming convention of rhsm.conf
             // Thus we can do some simplification of code
@@ -616,25 +597,25 @@ client.readConfig = () => {
 };
 
 client.toArray = obj => {
-        /*
+    /*
         checks if object passed in is an iterable or not
         see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
         for more info
          */
-        if (obj == null) {
-            return [];
-        }
-        if (typeof obj === 'string') {
-            return [obj];
-        }
-        if (typeof obj[Symbol.iterator] === 'function' ) {
-            return Array.from(obj);
-        }
-    };
+    if (obj == null) {
+        return [];
+    }
+    if (typeof obj === 'string') {
+        return [obj];
+    }
+    if (typeof obj[Symbol.iterator] === 'function') {
+        return Array.from(obj);
+    }
+};
 
 const detectInsights = () => {
-    return cockpit.spawn([ "which", "insights-client" ], { err: "ignore" }).then(
-        () => client.insightsAvailable = true,
+    return cockpit.spawn(["which", "insights-client"], { err: "ignore" }).then(
+        () => { client.insightsAvailable = true },
         () => {
             PK.detect().then(pk_available => {
                 client.insightsAvailable = pk_available && client.insightsPackage;
@@ -643,7 +624,8 @@ const detectInsights = () => {
 };
 
 const updateConfig = () => {
-    return client.readConfig().then(detectInsights).then(needRender);
+    return client.readConfig().then(detectInsights)
+            .then(needRender);
 };
 
 client.setError = (severity, message) => {

@@ -189,7 +189,7 @@ export function proxy(name, kind) {
 
         function refresh_interface(path, iface) {
             systemd_client.call(path,
-                                "org.freedesktop.DBus.Properties", "GetAll", [ iface ])
+                                "org.freedesktop.DBus.Properties", "GetAll", [iface])
                     .fail(function (error) {
                         console.log(error);
                     })
@@ -288,8 +288,8 @@ export function proxy(name, kind) {
     function call_manager_with_reload(method, args) {
         return call_manager(method, args).then(function () {
             var dfd = cockpit.defer();
-            call_manager("Reload", [ ])
-                    .done(function () { dfd.resolve(); })
+            call_manager("Reload", [])
+                    .done(function () { dfd.resolve() })
                     .fail(function (error) {
                     // HACK: https://bugzilla.redhat.com/show_bug.cgi?id=1560549
                     // some systemd versions disconnect too fast from the bus
@@ -305,27 +305,27 @@ export function proxy(name, kind) {
     }
 
     function start() {
-        return call_manager_with_job("StartUnit", [ name, "replace" ]);
+        return call_manager_with_job("StartUnit", [name, "replace"]);
     }
 
     function stop() {
-        return call_manager_with_job("StopUnit", [ name, "replace" ]);
+        return call_manager_with_job("StopUnit", [name, "replace"]);
     }
 
     function restart() {
-        return call_manager_with_job("RestartUnit", [ name, "replace" ]);
+        return call_manager_with_job("RestartUnit", [name, "replace"]);
     }
 
     function tryRestart() {
-        return call_manager_with_job("TryRestartUnit", [ name, "replace" ]);
+        return call_manager_with_job("TryRestartUnit", [name, "replace"]);
     }
 
     function enable() {
-        return call_manager_with_reload("EnableUnitFiles", [ [ name ], false, false ]);
+        return call_manager_with_reload("EnableUnitFiles", [[name], false, false]);
     }
 
     function disable() {
-        return call_manager_with_reload("DisableUnitFiles", [ [ name ], false ]);
+        return call_manager_with_reload("DisableUnitFiles", [[name], false]);
     }
 
     return self;

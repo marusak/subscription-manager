@@ -27,11 +27,11 @@ import subscriptionsView from './subscriptions-view.jsx';
 import * as Insights from './insights.jsx';
 import * as Dialog from '../lib/cockpit-components-dialog.jsx';
 
-let _ = cockpit.gettext;
+const _ = cockpit.gettext;
 
-let dataStore = { };
+const dataStore = { };
 
-let registerDialogDetails = {
+const registerDialogDetails = {
     user: '',
     password: '',
     activation_keys: '',
@@ -54,11 +54,12 @@ function registerSystem (update_progress) {
     });
 }
 
-let footerProps = {
-    'actions': [
-        { 'clicked': registerSystem,
-         'caption': _("Register"),
-         'style': 'primary',
+const footerProps = {
+    actions: [
+        {
+            clicked: registerSystem,
+            caption: _("Register"),
+            style: 'primary',
         },
     ]
 };
@@ -80,7 +81,7 @@ function openRegisterDialog() {
 
         // show dialog to register
         let renderDialog;
-        let updatedData = function(prop, data) {
+        const updatedData = function(prop, data) {
             if (prop) {
                 if (data.target) {
                     if (data.target.type === "checkbox") {
@@ -95,10 +96,10 @@ function openRegisterDialog() {
 
             registerDialogDetails.onChange = updatedData;
 
-            let dialogProps = {
-                'id': 'register_dialog',
-                'title': _("Register System"),
-                'body': React.createElement(subscriptionsRegister.dialogBody, registerDialogDetails),
+            const dialogProps = {
+                id: 'register_dialog',
+                title: _("Register System"),
+                body: React.createElement(subscriptionsRegister.dialogBody, registerDialogDetails),
             };
 
             if (renderDialog)
@@ -111,14 +112,15 @@ function openRegisterDialog() {
 }
 
 function unregisterSystem() {
-    Insights.unregister().catch(error => true).then(subscriptionsClient.unregisterSystem);
+    Insights.unregister().catch(console.log)
+            .then(subscriptionsClient.unregisterSystem);
 }
 
 function initStore(rootElement) {
     subscriptionsClient.addEventListener("dataChanged",
-        () => {
-            dataStore.render();
-        }
+                                         () => {
+                                             dataStore.render();
+                                         }
     );
 
     dataStore.render = () => {
@@ -135,7 +137,7 @@ function initStore(rootElement) {
                 register: openRegisterDialog,
                 unregister: unregisterSystem,
             }),
-            rootElement
+                        rootElement
         );
     };
     subscriptionsClient.init();

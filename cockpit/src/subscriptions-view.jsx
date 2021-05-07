@@ -24,7 +24,7 @@ import { ListView, ListViewItem, ListViewIcon } from 'patternfly-react';
 import { Row, Col } from 'react-bootstrap';
 import { InsightsStatus } from './insights.jsx';
 
-let _ = cockpit.gettext;
+const _ = cockpit.gettext;
 
 class Listing extends React.Component {
     render() {
@@ -90,6 +90,7 @@ class DismissableError extends React.Component {
         // This binding is necessary to make `this` work in the callback
         this.handleDismissError = this.handleDismissError.bind(this);
     }
+
     handleDismissError(err) {
         // only consider primary mouse button
         if (!err || err.button !== 0)
@@ -99,8 +100,9 @@ class DismissableError extends React.Component {
         }
         err.stopPropagation();
     }
+
     render() {
-        let debug_str = JSON.stringify(this.props.children);
+        const debug_str = JSON.stringify(this.props.children);
         console.debug(debug_str);
         let classes_div = "alert alert-danger alert-dismissable alert-ct-top";
         let classes_icon = "pficon pficon-error-circle-o";
@@ -113,11 +115,11 @@ class DismissableError extends React.Component {
         }
         if (this.props.severity === "warning") {
             classes_div = "alert alert-warning alert-dismissable alert-ct-top";
-            classes_icon = "pficon pficon-warning-triangle-o"
+            classes_icon = "pficon pficon-warning-triangle-o";
         }
         if (this.props.severity === "info") {
             classes_div = "alert alert-info alert-dismissable alert-ct-top";
-            classes_icon = "pficon pficon-info"
+            classes_icon = "pficon pficon-info";
         }
 
         return (
@@ -125,7 +127,7 @@ class DismissableError extends React.Component {
                 <span className={classes_icon} />
                 <span>{this.props.children}</span>
                 <button type="button" className="close" aria-hidden="true" onClick={this.handleDismissError}>
-                    <span className="pficon pficon-close"/>
+                    <span className="pficon pficon-close" />
                 </button>
             </div>
         );
@@ -148,6 +150,7 @@ class SubscriptionStatus extends React.Component {
         this.handleRegisterSystem = this.handleRegisterSystem.bind(this);
         this.handleUnregisterSystem = this.handleUnregisterSystem.bind(this);
     }
+
     handleRegisterSystem(err) {
         // only consider primary mouse button
         if (!err || err.button !== 0)
@@ -156,6 +159,7 @@ class SubscriptionStatus extends React.Component {
             this.props.register();
         err.stopPropagation();
     }
+
     handleUnregisterSystem(e) {
         // only consider primary mouse button
         if (!e || e.button !== 0)
@@ -164,6 +168,7 @@ class SubscriptionStatus extends React.Component {
             this.props.unregister();
         e.stopPropagation();
     }
+
     render() {
         let errorMessage;
         if (this.props.error) {
@@ -179,50 +184,49 @@ class SubscriptionStatus extends React.Component {
         let action;
         let insights;
         let note;
-        let syspurpose;
         let sla;
         let usage;
         let role;
         let add_ons;
         let syspurpose_status;
-        let isUnregistering = (this.props.status === "unregistering");
-        if (this.props.syspurpose["service_level_agreement"]) {
+        const isUnregistering = (this.props.status === "unregistering");
+        if (this.props.syspurpose.service_level_agreement) {
             sla = (
                 <div>
                     <label>
                         { _("Service Level:  ") }
-                        <span className="value">{ _(String(this.props.syspurpose["service_level_agreement"])) }</span>
+                        <span className="value">{ _(String(this.props.syspurpose.service_level_agreement)) }</span>
                     </label>
                 </div>
             );
         }
-        if (this.props.syspurpose["usage"]) {
+        if (this.props.syspurpose.usage) {
             usage = (
                 <div>
                     <label>
                         { _("Usage:  ") }
-                        <span className="value">{ _(String(this.props.syspurpose["usage"])) }</span>
-                    </label>
-                </div>
-        );
-        }
-        if (this.props.syspurpose["role"]) {
-            role = (
-                <div>
-                    <label>
-                        { _("Role:  ") }
-                        <span className="value">{ _(String(this.props.syspurpose["role"])) }</span>
+                        <span className="value">{ _(String(this.props.syspurpose.usage)) }</span>
                     </label>
                 </div>
             );
         }
-        if (this.props.syspurpose["addons"]) {
+        if (this.props.syspurpose.role) {
+            role = (
+                <div>
+                    <label>
+                        { _("Role:  ") }
+                        <span className="value">{ _(String(this.props.syspurpose.role)) }</span>
+                    </label>
+                </div>
+            );
+        }
+        if (this.props.syspurpose.addons) {
             add_ons = (
                 <div>
                     <label>
                         { _("Addons:  ") }
                         <span className="value">
-                            { _(String(subscriptionsClient.toArray(this.props.syspurpose["addons"]).join(", "))) }
+                            { _(String(subscriptionsClient.toArray(this.props.syspurpose.addons).join(", "))) }
                         </span>
                     </label>
                 </div>
@@ -238,7 +242,7 @@ class SubscriptionStatus extends React.Component {
                 </div>
             );
         }
-        syspurpose = (
+        const syspurpose = (
             <div>
                 <h2>{_("System Purpose")}</h2>
                 <div className="dl-horizontal">
@@ -263,7 +267,7 @@ class SubscriptionStatus extends React.Component {
             if (isUnregistering) {
                 note = (
                     <div className="dialog-wait-ct">
-                        <div className="spinner spinner-sm"/>
+                        <div className="spinner spinner-sm" />
                         <span>{ _("Unregistering") }</span>
                     </div>
                 );
@@ -326,7 +330,7 @@ class SubscriptionsPage extends React.Component {
         );
     }
     renderSubscriptions() {
-        let entries = this.props.products.map(function (itm) {
+        const entries = this.props.products.map(function (itm) {
             let icon_name;
             let status_text;
 
@@ -372,18 +376,19 @@ class SubscriptionsPage extends React.Component {
 
         return (
             <div className="container-fluid">
-            <SubscriptionStatus {...this.props }/>
-            <Listing
+                <SubscriptionStatus {...this.props } />
+                <Listing
                     title={ _("Installed products") }
                     emptyCaption={ _("No installed products detected.") }
-                    >
-                <ListView className="installed-products">
-                {entries}
-                </ListView>
-            </Listing>
+                >
+                    <ListView className="installed-products">
+                        {entries}
+                    </ListView>
+                </Listing>
             </div>
         );
     }
+
     render() {
         if (this.props.status === undefined ||
             this.props.status === 'not-found' ||

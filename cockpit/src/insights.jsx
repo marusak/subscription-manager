@@ -27,7 +27,7 @@ import * as PK from "../lib/packagekit";
 
 import subscriptionsClient from './subscriptions-client';
 
-let _ = cockpit.gettext;
+const _ = cockpit.gettext;
 
 moment.locale(cockpit.language);
 
@@ -35,7 +35,7 @@ const insights_timer = service.proxy("insights-client.timer", "Timer");
 const insights_service = service.proxy("insights-client.service", "Service");
 
 export function detect() {
-    return cockpit.spawn([ "which", "insights-client" ], { err: "ignore" }).then(() => true, () => false);
+    return cockpit.spawn(["which", "insights-client"], { err: "ignore" }).then(() => true, () => false);
 }
 
 export function catch_error(err) {
@@ -51,7 +51,7 @@ export function catch_error(err) {
 function ensure_installed(update_progress) {
     return detect().then(installed => {
         if (!installed)
-            return PK.check_missing_packages([ subscriptionsClient.insightsPackage ], update_checking_progress(update_progress))
+            return PK.check_missing_packages([subscriptionsClient.insightsPackage], update_checking_progress(update_progress))
                     .then(data => {
                         if (data.unavailable_names.length > 0)
                             return Promise.reject(cockpit.format(_("The $0 package is not available from any repository."),
@@ -68,7 +68,7 @@ function ensure_installed(update_progress) {
 
 export function register(update_progress) {
     return ensure_installed(update_progress).then(() => {
-        const proc = cockpit.spawn([ "insights-client", "--register" ], { superuser: true, err: "message" });
+        const proc = cockpit.spawn(["insights-client", "--register"], { superuser: true, err: "message" });
         if (update_progress)
             update_progress(_("Connecting to Insights"), () => { proc.close() });
         return proc;
@@ -77,8 +77,8 @@ export function register(update_progress) {
 
 export function unregister() {
     if (insights_timer.enabled) {
-        return cockpit.spawn([ "insights-client", "--unregister" ], { superuser: true, err: "message" })
-            .catch(catch_error);
+        return cockpit.spawn(["insights-client", "--unregister"], { superuser: true, err: "message" })
+                .catch(catch_error);
     } else {
         return cockpit.resolve();
     }
@@ -111,7 +111,7 @@ export const blurb =
     _("Proactively identify and remediate threats to security, performance, availability, and stability with Red Hat Insights \u2014 with predictive analytics, avoid problems and unplanned downtime in your Red Hat environment.");
 
 export const link =
-    <a href="https://www.redhat.com/en/technologies/management/insights" target="_blank" rel="noopener">Red Hat Insights <i className="fa fa-external-link"/></a>;
+    <a href="https://www.redhat.com/en/technologies/management/insights" target="_blank" rel="noopener noreferrer">Red Hat Insights <i className="fa fa-external-link" /></a>;
 
 function install_data_summary(data) {
     if (!data || data.missing_names.length == 0)
@@ -126,7 +126,7 @@ function install_data_summary(data) {
                                           data.extra_names.length), <strong>{data.missing_names[0]}</strong>, data.extra_names.length);
     if (data.remove_names.length > 0) {
         summary = [
-            {summary},
+            { summary },
             <br />,
             <span className="pficon pficon-warning-triangle-o" />, "\n",
             cockpit.format(cockpit.ngettext(_("$0 package needs to be removed."),
@@ -156,9 +156,9 @@ function install_data_summary(data) {
                 </div>
             );
 
-        summary = [ <p>{summary}</p>,
-                    <Revealer summary={_("Details")}>{extra_details}{remove_details}</Revealer>
-                  ];
+        summary = [<p>{summary}</p>,
+            <Revealer summary={_("Details")}>{extra_details}{remove_details}</Revealer>
+        ];
     }
 
     return summary;
@@ -243,7 +243,7 @@ function show_connect_dialog() {
         if (!installed) {
             checking_install = true;
             update();
-            PK.check_missing_packages([ subscriptionsClient.insightsPackage ], p => {
+            PK.check_missing_packages([subscriptionsClient.insightsPackage], p => {
                 cancel = p.cancel;
                 let pm = null;
                 if (p.waiting)
@@ -284,9 +284,9 @@ class Revealer extends React.Component {
         return (
             <div>
                 <a onClick={event => { if (event.button == 0) this.setState({ revealed: !this.state.revealed }); }}>
-                   {this.props.summary}
-                </a> <i className={this.state.revealed ? "fa fa-angle-down" : "fa fa-angle-right"}/>
-                <br/>
+                    {this.props.summary}
+                </a> <i className={this.state.revealed ? "fa fa-angle-down" : "fa fa-angle-right"} />
+                <br />
                 {this.state.revealed && this.props.children}
             </div>
         );
@@ -294,21 +294,21 @@ class Revealer extends React.Component {
 }
 
 const get_monotonic_start = cockpit.spawn(
-    [ "/usr/libexec/platform-python", "-c",
-      "import time; print(time.clock_gettime(time.CLOCK_REALTIME) - time.clock_gettime(time.CLOCK_MONOTONIC))"
+    ["/usr/libexec/platform-python", "-c",
+        "import time; print(time.clock_gettime(time.CLOCK_REALTIME) - time.clock_gettime(time.CLOCK_MONOTONIC))"
     ]).then(data => {
-        return parseFloat(data);
-    });
+    return parseFloat(data);
+});
 
 function calc_next_elapse(monotonic_start, timer) {
-    let next_mono = Infinity, next_real = Infinity;
+    let next_mono = Infinity; let next_real = Infinity;
     if (monotonic_start) {
         if (timer.NextElapseUSecMonotonic)
             next_mono = timer.NextElapseUSecMonotonic / 1e6 + monotonic_start;
         if (timer.NextElapseUSecRealtime)
             next_real = timer.NextElapseUSecRealtime / 1e6;
     }
-    let next = Math.min(next_mono, next_real);
+    const next = Math.min(next_mono, next_real);
     if (next !== Infinity)
         return moment(next * 1000).calendar();
     else
@@ -324,7 +324,7 @@ function jump_to_timer() {
 }
 
 function monitor_last_upload() {
-    let self = {
+    const self = {
         timestamp: 0,
         results: null,
 
@@ -333,18 +333,18 @@ function monitor_last_upload() {
 
     cockpit.event_target(self);
 
-    let results_file = cockpit.file("/etc/insights-client/.last-upload.results", { syntax: JSON });
+    const results_file = cockpit.file("/etc/insights-client/.last-upload.results", { syntax: JSON });
     results_file.watch(data => {
         self.results = data;
-        cockpit.spawn([ "stat", "-c", "%Y", "/etc/insights-client/.last-upload.results" ], { err: "message" })
-            .then(ts => {
-                self.timestamp = parseInt(ts);
-                self.dispatchEvent("changed");
-            })
-            .catch(() => {
-                self.timestamp = 0;
-                self.dispatchEvent("changed");
-            });
+        cockpit.spawn(["stat", "-c", "%Y", "/etc/insights-client/.last-upload.results"], { err: "message" })
+                .then(ts => {
+                    self.timestamp = parseInt(ts);
+                    self.dispatchEvent("changed");
+                })
+                .catch(() => {
+                    self.timestamp = 0;
+                    self.dispatchEvent("changed");
+                });
     });
 
     function close() {
@@ -359,7 +359,7 @@ const last_upload_monitor = monitor_last_upload();
 function show_status_dialog() {
     function show(monotonic_start) {
         let lastupload = last_upload_monitor.timestamp;
-        let next_elapse = calc_next_elapse(monotonic_start, insights_timer.details);
+        const next_elapse = calc_next_elapse(monotonic_start, insights_timer.details);
 
         let failed_text = null;
         if (insights_service.unit.ActiveExitTimestamp &&
@@ -368,56 +368,56 @@ function show_status_dialog() {
             failed_text = _("The last Insights data upload has failed.");
         }
 
-        let dlg = show_modal_dialog(
+        const dlg = show_modal_dialog(
             {
                 title: _("Connected to Red Hat Insights"),
                 body: (
-                        <div className="modal-body">
-                          <table>
+                    <div className="modal-body">
+                        <table>
                             <tbody>
-                              <tr>
-                                <th style={{ textAlign: "right", paddingRight: "1em" }}>Next Insights data upload</th>
-                                <td>{next_elapse}</td>
-                              </tr>
-                              { lastupload ?
-                              <tr>
-                                <th style={{ textAlign: "right", paddingRight: "1em" }}>Last Insights data upload</th>
-                                <td>{moment(lastupload * 1000).calendar()}</td>
-                               </tr> : null
-                              }
+                                <tr>
+                                    <th style={{ textAlign: "right", paddingRight: "1em" }}>Next Insights data upload</th>
+                                    <td>{next_elapse}</td>
+                                </tr>
+                                { lastupload
+                                    ? <tr>
+                                        <th style={{ textAlign: "right", paddingRight: "1em" }}>Last Insights data upload</th>
+                                        <td>{moment(lastupload * 1000).calendar()}</td>
+                                    </tr> : null
+                                }
                             </tbody>
-                          </table>
-                          <br/>
-                          { insights_timer.state == "failed" &&
-                          <div className="alert alert-warning">
-                            <span className="pficon pficon-warning-triangle-o"/>
-                              {_("Next Insights data upload could not be scheduled.")}{" "}
-                              <a onClick={left(jump_to_timer)}>{_("Details")}</a>
-                          </div>
-                          }
-                          { insights_service.state == "failed" && failed_text &&
-                          <div className="alert alert-warning">
-                            <span className="pficon pficon-warning-triangle-o"/>
-                              {failed_text}{" "}
-                              <a onClick={left(jump_to_service)}>{_("Details")}</a>
-                          </div>
-                          }
-                          <Revealer summary={_("Disconnect from Insights")}>
-                            <div className="alert alert-warning"
-                                 style={{ "padding": "14px", "marginTop": "1ex", "marginBottom": "0px" }}>
-                              <p>{_("If you disconnect this system from Insights, it will no longer report it's Insights status in Red Hat Cloud or Satellite.")}</p>
-                              <br/>
-                              <button className="btn btn-danger" onClick={left(disconnect)}>
-                                {_("Disconnect from Insights")}
-                              </button>
-                            </div>
-                          </Revealer>
+                        </table>
+                        <br />
+                        { insights_timer.state == "failed" &&
+                        <div className="alert alert-warning">
+                            <span className="pficon pficon-warning-triangle-o" />
+                            {_("Next Insights data upload could not be scheduled.")}{" "}
+                            <a onClick={left(jump_to_timer)}>{_("Details")}</a>
                         </div>
+                        }
+                        { insights_service.state == "failed" && failed_text &&
+                        <div className="alert alert-warning">
+                            <span className="pficon pficon-warning-triangle-o" />
+                            {failed_text}{" "}
+                            <a onClick={left(jump_to_service)}>{_("Details")}</a>
+                        </div>
+                        }
+                        <Revealer summary={_("Disconnect from Insights")}>
+                            <div className="alert alert-warning"
+                                 style={{ padding: "14px", marginTop: "1ex", marginBottom: "0px" }}>
+                                <p>{_("If you disconnect this system from Insights, it will no longer report it's Insights status in Red Hat Cloud or Satellite.")}</p>
+                                <br />
+                                <button className="btn btn-danger" onClick={left(disconnect)}>
+                                    {_("Disconnect from Insights")}
+                                </button>
+                            </div>
+                        </Revealer>
+                    </div>
                 )
             },
             {
                 cancel_caption: _("Close"),
-                actions: [ ]
+                actions: []
             }
         );
 
@@ -425,8 +425,8 @@ function show_status_dialog() {
             dlg.setFooterProps(
                 {
                     cancel_caption: _("Cancel"),
-                    actions: [ ],
-                    idle_message: <div className="spinner spinner-sm"/>
+                    actions: [],
+                    idle_message: <div className="spinner spinner-sm" />
                 });
             unregister().then(
                 () => {
@@ -436,16 +436,15 @@ function show_status_dialog() {
                     dlg.setFooterProps(
                         {
                             cancel_caption: _("Close"),
-                            actions: [ ],
+                            actions: [],
                             static_error: error.toString()
                         });
-                })
+                });
         }
     }
 
     get_monotonic_start.then(show).catch(err => { console.warn(err); show(null) });
 }
-
 
 export class InsightsStatus extends React.Component {
     constructor() {
@@ -470,17 +469,17 @@ export class InsightsStatus extends React.Component {
         let status;
 
         if (insights_timer.enabled) {
-            let warn = (insights_service.state == "failed" &&
+            const warn = (insights_service.state == "failed" &&
                         insights_service.unit.ActiveExitTimestamp &&
                         insights_service.unit.ActiveExitTimestamp / 1e6 > last_upload_monitor.timestamp);
 
             status = (
-                    <div style={{display: "inline-block", verticalAlign: "top" }}>
+                <div style={{ display: "inline-block", verticalAlign: "top" }}>
                     <a onClick={left(show_status_dialog)}>{_("Connected to Insights")}</a>
-                    { warn && [ " ", <i className="pficon pficon-warning-triangle-o"/> ] }
-                    <br/>
-                    <a href="http://cloud.redhat.com/insights" target="_blank" rel="noopener">
-                    View your Insights results <i className="fa fa-external-link"/>
+                    { warn && [" ", <i className="pficon pficon-warning-triangle-o" />] }
+                    <br />
+                    <a href="http://cloud.redhat.com/insights" target="_blank" rel="noopener noreferrer">
+                        View your Insights results <i className="fa fa-external-link" />
                     </a>
                 </div>
             );
