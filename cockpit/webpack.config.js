@@ -184,12 +184,6 @@ module.exports = {
             {
                 enforce: 'pre',
                 exclude: /node_modules/,
-                loader: 'jshint-loader',
-                test: /\.js$/
-            },
-            {
-                enforce: 'pre',
-                exclude: /node_modules/,
                 loader: 'eslint-loader',
                 test: /\.jsx$/
             },
