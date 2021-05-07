@@ -194,12 +194,6 @@ module.exports = {
                 test: /\.jsx$/
             },
             {
-                enforce: 'pre',
-                exclude: /node_modules/,
-                loader: 'jshint-loader',
-                test: /\.es6$/
-            },
-            {
                 exclude: /node_modules/,
                 loader: 'babel-loader',
                 test: /\.js$/
@@ -208,11 +202,6 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'babel-loader',
                 test: /\.jsx$/
-            },
-            {
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                test: /\.es6$/
             },
             {
                 exclude: /node_modules/,
