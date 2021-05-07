@@ -3,7 +3,7 @@ const copy = require("copy-webpack-plugin");
 const fs = require("fs");
 const webpack = require("webpack");
 const CompressionPlugin = require("compression-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const miniCssExtractPlugin = require('mini-css-extract-plugin');
 const glob = require("glob");
 const po2json = require("po2json");
 
@@ -114,9 +114,9 @@ var plugins = [
         '$': 'jquery',
         'jQuery': 'jquery',
     }),
-    new ExtractTextPlugin("subscriptions.css"),
+    new miniCssExtractPlugin({ filename: "subscriptions.css" }),
     new Po2JSONPlugin(),
-    new ExtractTextPlugin("[name].css")
+    new miniCssExtractPlugin({ filename: "[name].css" }),
 ];
 
 if (!production) {
@@ -164,6 +164,9 @@ if (production) {
 
 module.exports = {
     mode: production ? 'production' : 'development',
+    resolveLoader: {
+        modules: [ nodedir, path.resolve(__dirname, 'lib') ],
+    },
     entry: info.entries,
     externals: externals,
     output: output,
@@ -188,15 +191,18 @@ module.exports = {
                 test: /\.jsx$/
             },
             {
-                exclude: /node_modules/,
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: {
-                        loader: "css-loader",
-                        options: { minimize: production },
+                test: /\.s?css$/,
+                use: [
+                    miniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: !production,
+                            url: false
+                        }
                     },
-                }),
-                test: /\.css$/
+                    'sassc-loader',
+                ]
             },
             {
                 test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|wav|mp3)$/,
@@ -207,7 +213,11 @@ module.exports = {
             },
             {
                 test: /\.less$/,
-                loader: ExtractTextPlugin.extract("css-loader?sourceMap&minimize=!less-loader?sourceMap&compress=false")
+                use: [
+                    miniCssExtractPlugin.loader,
+                    "css-loader",
+                    "less-loader"
+                ]
             },
         ]
     },
