@@ -189,21 +189,6 @@ module.exports = {
                 },
                 loader: 'file-loader',
             },
-            {
-                exclude: /node_modules/,
-                use: [
-                    extract.loader,
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            sourceMap: true,
-                            url: false,
-                        },
-                    },
-                    'less-loader',
-                ],
-                test: /\.less$/
-            },
             /* HACK: remove unwanted fonts from PatternFly's css */
             /* The following rule will bundle the patternfly-cockpit.scss file included from index.js */
             /* Since Patternfly 4 includes more fonts than we are interested in do some fonts filtering here */
