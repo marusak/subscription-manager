@@ -21,7 +21,7 @@ var cockpit = require("cockpit");
 var _ = cockpit.gettext;
 
 var React = require("react");
-import Select from "./Select/Select.jsx";
+import { FormSelect, FormSelectOption } from '@patternfly/react-core';
 import '../lib/form-layout.less';
 
 import subscriptionsClient from './subscriptions-client';
@@ -137,21 +137,18 @@ class SubscriptionsRegister extends React.Component {
             );
         }
 
-        const urlEntries = {
-            'default': _("Default"),
-            'custom': _("Custom URL"),
-        };
         return (
             <div className="modal-body">
                 <form className="ct-form-layout">
                     <label className="control-label" htmlFor="subscription-register-url">
                         {_("URL")}
                     </label>
-                    <Select key='urlSource' onChange={value => this.props.onChange('url', value)}
-                            id="subscription-register-url" value={this.props.url}>
-                        <option value="default">{ urlEntries['default'] }</option>
-                        <option value="custom">{ urlEntries['custom'] }</option>
-                    </Select>
+                    <FormSelect className='pf-c-form-control' id="subscription-register-url"
+                                aria-label={_("URL")} value={this.props.url}
+                                onChange={value => this.props.onChange('url', value)}>
+                        <FormSelectOption value='default' key='default' label={_("Default")} />
+                        <FormSelectOption value='custom' key='custom' label={_("Custom URL")} />
+                    </FormSelect>
                     {customURL}
                     <label className="checkbox-inline">
                         <input id="subscription-proxy-use" type="checkbox" checked={this.props.proxy}
