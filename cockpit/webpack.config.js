@@ -117,10 +117,6 @@ var plugins = [
         }
     }),
     new copy(info.files),
-    new webpack.ProvidePlugin({
-        '$': 'jquery',
-        'jQuery': 'jquery',
-    }),
     new Po2JSONPlugin(),
     new extract("[name].css"),
     new Po2JSONPlugin(),
