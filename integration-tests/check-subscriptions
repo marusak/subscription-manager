@@ -181,7 +181,7 @@ class TestSubscriptions(SubscriptionsCase):
         b.wait_visible("#subscription-register-url")
 
         # enter server and incorrect login data
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", CANDLEPIN_URL)
         b.set_input_text("#subscription-register-username", "doc")
         b.set_input_text("#subscription-register-password", "wrongpass")
@@ -236,7 +236,7 @@ class TestSubscriptions(SubscriptionsCase):
 
         # enter server data
         b.wait_visible("#subscription-register-url")
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", CANDLEPIN_URL)
 
         # select registration method "activation key"
@@ -281,7 +281,7 @@ class TestSubscriptions(SubscriptionsCase):
         b.wait_visible("#subscription-register-url")
 
         # enter server and correct login data
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", CANDLEPIN_URL)
         b.set_input_text("#subscription-register-username", "doc")
         b.set_input_text("#subscription-register-password", "password")
@@ -319,7 +319,7 @@ class TestSubscriptions(SubscriptionsCase):
         b.click("button:contains('Register')")
         b.wait_visible("#subscription-register-url")
 
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", CANDLEPIN_ADDR + ":8443/candlepin")
         b.set_input_text("#subscription-register-username", "admin")
         b.set_input_text("#subscription-register-password", "admin")
@@ -368,7 +368,7 @@ class TestSubscriptions(SubscriptionsCase):
         b.click("button:contains('Register')")
         b.wait_visible("#subscription-register-url")
 
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", CANDLEPIN_ADDR + ":8443/candlepin")
         b.set_input_text("#subscription-register-username", "admin")
         b.set_input_text("#subscription-register-password", "admin")
@@ -423,7 +423,7 @@ class TestSubscriptionsPackages(SubscriptionsCase, PackageCase):
         b.click("button:contains('Register')")
         b.wait_visible("#subscription-register-url")
 
-        b.set_val("#subscription-register-url", "custom")
+        b.set_checked("#subscription-register-url", True)
         b.set_input_text("#subscription-register-url-custom", "10.111.112.100:8443/candlepin")
         b.set_input_text("#subscription-register-username", "admin")
         b.set_input_text("#subscription-register-password", "admin")
